@@ -88,6 +88,8 @@ func populatePeopleTable(db *sql.DB, tableName string) {
 }
 
 func copyTable(db *sql.DB, sourceTable string, targetTable string) {
+	fmt.Println("Copying table %s into %s", sourceTable, targetTable)
+
 	createTableQuery := fmt.Sprintf("CREATE TABLE %s LIKE %s", targetTable, sourceTable)
 	query, err := db.Query(createTableQuery)
 
