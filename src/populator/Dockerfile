@@ -13,3 +13,4 @@ RUN apk --no-cache add ca-certificates
 RUN mkdir /app
 COPY --from=builder /app/populator /app/
 WORKDIR /app/
+COPY schema.sql /app/

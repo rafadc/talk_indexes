@@ -1,2 +1,4 @@
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
+github.com/jaswdr/faker v1.0.2 h1:3iRZztCC4oU67i67qGcyhIxeKgHQQH/iCifJOj3uOSI=
+github.com/jaswdr/faker v1.0.2/go.mod h1:9S4x1SRPC3m+iLgZTx2HZ0/R1/B0hwuL8uvOAiuJNtg=
