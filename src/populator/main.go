@@ -75,7 +75,7 @@ func populatePeopleTable(db *sql.DB, tableName string) {
 
 	for i := 0; i < 100_000; i++ {
 		insertQuery.Exec(
-			faker.Person().Name(),
+			faker.Person().FirstName(),
 			faker.Person().LastName(),
 			faker.Time().Time(time.Now()),
 			faker.Company().Name(),
