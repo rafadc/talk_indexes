@@ -26,6 +26,15 @@ backgroundImage: url('assets/bg.png')
 
 - The basic mechanism to understand how your query will run
 
+```sql
+EXPLAIN PLAN SELECT * FROM people_without_indexes WHERE company='Stuart';
+```
+
+---
+
+# Reading an explain plan
+
+
 ---
 
 # Full scans on big tables
@@ -34,13 +43,10 @@ backgroundImage: url('assets/bg.png')
 - On absurdly bigtables maybe you need different mechanisms outside the scope of this talk
 
 ---
-![bg left](./assets/money_burn.jpg)
 
 # Speeding up queries with indexes
 
 ---
-
-![bg right](./assets/mark_twain.jpg)
 
 # Single column indexes
 
