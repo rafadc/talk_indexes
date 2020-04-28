@@ -8,6 +8,7 @@ services:
       MYSQL_DATABASE: 'indexes'
       MYSQL_USER: 'indexes'
       MYSQL_PASSWORD: 'indexes'
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
     ports:
       - '3306:3306'
     volumes:
@@ -17,6 +18,7 @@ services:
     build: populator/.
     depends_on:
       - mysql
+    command: "./populator"
 
 volumes:
   data:
