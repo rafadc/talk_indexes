@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Populating mySQL")
+	fmt.Println("Populating mySQL...")
 
 	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes")
 
@@ -23,18 +23,20 @@ func main() {
 		fmt.Println("Already populated")
 		os.Exit(1)
 	}
+
+	fmt.Println("mySQL seems not to be populated yet. Starting...")
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
-	query := `SELECT *
+	query := `SELECT count(*)
 	FROM information_schema.tables
 	WHERE table_schema = 'indexes'
 		AND table_name = ?
 	LIMIT 1;`
-	var result string
+	var result int8
 	err := db.QueryRow(query, tableName).Scan(&result)
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("The result is: %s", result)
+	return result != 0
 }
