@@ -1,6 +1,7 @@
 version: '3.3'
 
 services:
+
   mysql:
     image: mysql:5.7
     environment:
@@ -11,6 +12,7 @@ services:
       - '3306:3306'
     volumes:
       - data:/var/lib/mysql
+
   populator:
     build: populator/.
     depends_on:
