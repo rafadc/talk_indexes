@@ -14,14 +14,14 @@ import (
 
 func main() {
 	fmt.Println("Giving time mySQL to start...")
-	time.Sleep(10 * time.Second)
+	time.Sleep(15 * time.Second)
 
 	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes")
-
 	if err != nil {
 		panic(err.Error())
 	}
 
+	db.SetMaxOpenConns(50)
 	defer db.Close()
 
 	if tableExists(db, "people_without_indexes") {
@@ -33,6 +33,8 @@ func main() {
 	loadDBSchema(db)
 
 	populatePeopleTable(db, "people_without_indexes")
+	copyTable(db, "people_without_indexes", "people_single_index")
+	copyTable(db, "people_without_indexes", "people_multi_column_index")
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
@@ -64,18 +66,41 @@ func loadDBSchema(db *sql.DB) {
 }
 
 func populatePeopleTable(db *sql.DB, tableName string) {
-	fmt.Println("Populating table %s", tableName)
+	fmt.Println("Populating table ", tableName)
 
 	faker := faker.New()
+	insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company) VALUES(?,?,?,?)", tableName)
+	insertQuery, err := db.Prepare(insertQueryText)
+	defer insertQuery.Close()
 
-	insertQuery := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company) VALUES(?,?,?,?)", tableName)
-	_, err := db.Query(insertQuery,
-		faker.Person().Name(),
-		faker.Person().LastName(),
-		faker.Time(),
-		faker.Company().Name())
+	for i := 0; i < 100_000; i++ {
+		insertQuery.Exec(
+			faker.Person().Name(),
+			faker.Person().LastName(),
+			faker.Time().Time(time.Now()),
+			faker.Company().Name(),
+		)
+
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+}
+
+func copyTable(db *sql.DB, sourceTable string, targetTable string) {
+	createTableQuery := fmt.Sprintf("CREATE TABLE %s LIKE %s", targetTable, sourceTable)
+	query, err := db.Query(createTableQuery)
 
 	if err != nil {
 		panic(err.Error())
 	}
+	defer query.Close()
+
+	copyDataQuery := fmt.Sprintf("INSERT %s SELECT * FROM %s", targetTable, sourceTable)
+	query, err = db.Query(copyDataQuery)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	defer query.Close()
 }
