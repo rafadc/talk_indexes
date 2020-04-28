@@ -10,4 +10,4 @@ A sandbox to play with indexes is included in the src folder. Just enter there a
 docker-compose up
 ```
 
-And you will have a pre-populated db with the tables used in this talk.
+And you will have a pre-populated db with the tables used in this talk. You can connect to mySQL at 3306 port username as password ```indexes```
