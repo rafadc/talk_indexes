@@ -59,6 +59,8 @@ backgroundImage: url('assets/bg.png')
 
 - Put first the column that will remove the most values
 - The range condition of the query should be the last one
+- Like indexes are range indexes
+- A %something query cannot use the index
 
 ---
 
