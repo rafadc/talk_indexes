@@ -17,9 +17,14 @@ backgroundImage: url('assets/bg.png')
 
 ---
 
+# We will oversimplify
+
+---
+
 # Your query is slow
 
 - As your tables grow and grow, accessing your data will be slower and slower
+
 ---
 
 # Explain plans
