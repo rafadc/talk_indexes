@@ -41,6 +41,7 @@ backgroundImage: url('assets/bg.png')
 ---
 
 ![bg right](./assets/mark_twain.jpg)
+
 # Single column indexes
 
 ---
@@ -54,9 +55,10 @@ backgroundImage: url('assets/bg.png')
 
 ---
 
-# Ordering columns
+# Rules of thumb
 
 - Put first the column that will remove the most values
+- The range condition of the query should be the last one
 
 ---
 
@@ -65,12 +67,25 @@ backgroundImage: url('assets/bg.png')
 
 | Name   | Surname     | Date of birth    |
 | ------ | ----------- | ---------------- |
-| Rafael | de Castro   | 14-04-1980       | 
+| Rafael | de Castro   | 14-04-1980       |
 
 
 ---
 
 # Turning range queries into specific value queries
+
+- A classical trick is to turn a
+
+``` sql
+WHERE A > 1 AND A < 3
+```
+
+into
+
+``` sql
+WHERE A IN (1, 2, 3)
+```
+
 
 ---
 

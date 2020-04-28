@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'indexes'
+      MYSQL_USER: 'indexes'
+      MYSQL_PASSWORD: 'indexes'
+    ports:
+      - '3306:3306'
+    volumes:
+      - data:/var/lib/mysql
+  populator:
+    build: populator/.
+    depends_on:
+      - mysql
+
+volumes:
+  data:
