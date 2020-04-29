@@ -6,11 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jaswdr/faker"
 )
+
+var numberOfPeople = 100_000
 
 func main() {
 	log.Println("Giving time mySQL to start...")
@@ -73,18 +76,30 @@ func populatePeopleTable(db *sql.DB, tableName string) {
 	insertQuery, err := db.Prepare(insertQueryText)
 	defer insertQuery.Close()
 
-	for i := 0; i < 100_000; i++ {
-		insertQuery.Exec(
-			faker.Person().FirstName(),
-			faker.Person().LastName(),
-			faker.Time().Time(time.Now()),
-			faker.Company().Name(),
-		)
+	var wg sync.WaitGroup
 
-		if err != nil {
-			panic(err.Error())
-		}
+	wg.Add(numberOfPeople)
+
+	for i := 0; i < numberOfPeople; i++ {
+		go insertPerson(&wg, insertQuery, faker)
 	}
+
+	wg.Wait()
+
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func insertPerson(wg *sync.WaitGroup, insertQuery *sql.Stmt, faker faker.Faker) {
+	insertQuery.Exec(
+		faker.Person().FirstName(),
+		faker.Person().LastName(),
+		faker.Time().Time(time.Now()),
+		faker.Company().Name(),
+	)
+
+	wg.Done()
 }
 
 func copyTable(db *sql.DB, sourceTable string, targetTable string) {
