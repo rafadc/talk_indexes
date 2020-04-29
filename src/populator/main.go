@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Giving time mySQL to start...")
+	log.Println("Giving time mySQL to start...")
 	time.Sleep(15 * time.Second)
 
 	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes")
@@ -25,11 +25,11 @@ func main() {
 	defer db.Close()
 
 	if tableExists(db, "people_without_indexes") {
-		fmt.Println("Already populated")
+		log.Println("Already populated")
 		os.Exit(1)
 	}
 
-	fmt.Println("mySQL seems not to be populated yet. Starting...")
+	log.Println("mySQL seems not to be populated yet. Starting...")
 	loadDBSchema(db)
 
 	populatePeopleTable(db, "people_without_indexes")
@@ -38,7 +38,7 @@ func main() {
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
-	fmt.Println("Importing schema")
+	log.Println("Importing schema")
 
 	query := `SELECT count(*)
 	FROM information_schema.tables
@@ -66,7 +66,7 @@ func loadDBSchema(db *sql.DB) {
 }
 
 func populatePeopleTable(db *sql.DB, tableName string) {
-	fmt.Println("Populating table ", tableName)
+	log.Println("Populating table ", tableName)
 
 	faker := faker.New()
 	insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company) VALUES(?,?,?,?)", tableName)
@@ -88,7 +88,7 @@ func populatePeopleTable(db *sql.DB, tableName string) {
 }
 
 func copyTable(db *sql.DB, sourceTable string, targetTable string) {
-	fmt.Println("Copying table %s into %s", sourceTable, targetTable)
+	log.Println("Copying table %s into %s", sourceTable, targetTable)
 
 	createTableQuery := fmt.Sprintf("CREATE TABLE %s LIKE %s", targetTable, sourceTable)
 	query, err := db.Query(createTableQuery)
