@@ -7,7 +7,7 @@ backgroundImage: url('assets/bg.png')
 ---
 <!-- _class: lead -->
 
-# Database indexes
+# DB Indexing for performance
 
 ---
 
