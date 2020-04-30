@@ -19,11 +19,20 @@ backgroundImage: url('assets/bg.png')
 
 # We will oversimplify
 
+<!-- In a lot of situations we will do simplifications. This is not an advanced talk -->
+
+
 ---
 
 # Your query is slow
 
 - As your tables grow and grow, accessing your data will be slower and slower
+
+```sql
+SELECT * FROM people_without_indexes WHERE name="John";
+```
+
+....
 
 ---
 

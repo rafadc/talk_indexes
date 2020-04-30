@@ -13,13 +13,21 @@ import (
 	"github.com/jaswdr/faker"
 )
 
-var numberOfPeople = 100_000
+// Person represents a record to be generated and inserted
+type Person struct {
+	FirstName   string
+	LastName    string
+	DateOfBirth time.Time
+	Company     string
+}
+
+var workers = 20
 
 func main() {
 	log.Println("Giving time mySQL to start...")
 	time.Sleep(15 * time.Second)
 
-	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes")
+	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes?multiStatements=true")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -35,9 +43,11 @@ func main() {
 	log.Println("mySQL seems not to be populated yet. Starting...")
 	loadDBSchema(db)
 
-	populatePeopleTable(db, "people_without_indexes")
+	populatePeopleTable(db, "people_small", 1_000)
+	populatePeopleTable(db, "people_without_indexes", 1_000_000)
 	copyTable(db, "people_without_indexes", "people_single_index")
 	copyTable(db, "people_without_indexes", "people_multi_column_index")
+	copyTable(db, "people_without_indexes", "people_range_query")
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
@@ -62,28 +72,41 @@ func loadDBSchema(db *sql.DB) {
 		log.Fatal(err)
 	}
 
-	_, err = db.Query(string(content))
+	_, err = db.Exec(string(content))
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func populatePeopleTable(db *sql.DB, tableName string) {
+func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 	log.Println("Populating table ", tableName)
 
-	faker := faker.New()
 	insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company) VALUES(?,?,?,?)", tableName)
 	insertQuery, err := db.Prepare(insertQueryText)
 	defer insertQuery.Close()
 
 	var wg sync.WaitGroup
 
-	wg.Add(numberOfPeople)
-
-	for i := 0; i < numberOfPeople; i++ {
-		go insertPerson(&wg, insertQuery, faker)
+	if numberOfPeople%workers != 0 {
+		panic("The number of people must be divisible by the number of workers")
 	}
 
+	wg.Add(numberOfPeople)
+
+	for i := 0; i < workers; i++ {
+		go func() {
+			for j := 0; j < numberOfPeople/workers; j++ {
+				personToInsert := randomPerson()
+				insertQuery.Exec(
+					personToInsert.FirstName,
+					personToInsert.LastName,
+					personToInsert.DateOfBirth,
+					personToInsert.Company,
+				)
+				wg.Done()
+			}
+		}()
+	}
 	wg.Wait()
 
 	if err != nil {
@@ -91,15 +114,15 @@ func populatePeopleTable(db *sql.DB, tableName string) {
 	}
 }
 
-func insertPerson(wg *sync.WaitGroup, insertQuery *sql.Stmt, faker faker.Faker) {
-	insertQuery.Exec(
-		faker.Person().FirstName(),
-		faker.Person().LastName(),
-		faker.Time().Time(time.Now()),
-		faker.Company().Name(),
-	)
+func randomPerson() Person {
+	var fakeGenerator = faker.New()
 
-	wg.Done()
+	return Person{
+		FirstName:   fakeGenerator.Person().FirstName(),
+		LastName:    fakeGenerator.Person().LastName(),
+		DateOfBirth: fakeGenerator.Time().Time(time.Now()),
+		Company:     fakeGenerator.Company().Name(),
+	}
 }
 
 func copyTable(db *sql.DB, sourceTable string, targetTable string) {
