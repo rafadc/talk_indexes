@@ -19,6 +19,7 @@ type Person struct {
 	LastName    string
 	DateOfBirth time.Time
 	Company     string
+	Address     string
 }
 
 var workers = 20
@@ -32,7 +33,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	db.SetMaxOpenConns(50)
+	db.SetMaxOpenConns(40)
 	defer db.Close()
 
 	if tableExists(db, "people_without_indexes") {
@@ -44,7 +45,7 @@ func main() {
 	loadDBSchema(db)
 
 	populatePeopleTable(db, "people_small", 1_000)
-	populatePeopleTable(db, "people_without_indexes", 1_000_000)
+	populatePeopleTable(db, "people_without_indexes", 10_000_000)
 	copyTable(db, "people_without_indexes", "people_single_index")
 	copyTable(db, "people_without_indexes", "people_multi_column_index")
 	copyTable(db, "people_without_indexes", "people_range_query")
@@ -81,10 +82,6 @@ func loadDBSchema(db *sql.DB) {
 func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 	log.Println("Populating table ", tableName)
 
-	insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company) VALUES(?,?,?,?)", tableName)
-	insertQuery, err := db.Prepare(insertQueryText)
-	defer insertQuery.Close()
-
 	var wg sync.WaitGroup
 
 	if numberOfPeople%workers != 0 {
@@ -95,33 +92,41 @@ func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 
 	for i := 0; i < workers; i++ {
 		go func() {
+			var fakeGenerator = faker.New()
+			insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company, address) VALUES(?,?,?,?,?)", tableName)
+			insertQuery, err := db.Prepare(insertQueryText)
+
+			if err != nil {
+				panic(err.Error())
+			}
+			defer insertQuery.Close()
+
 			for j := 0; j < numberOfPeople/workers; j++ {
-				personToInsert := randomPerson()
-				insertQuery.Exec(
+				personToInsert := randomPerson(fakeGenerator)
+				_, err := insertQuery.Exec(
 					personToInsert.FirstName,
 					personToInsert.LastName,
 					personToInsert.DateOfBirth,
 					personToInsert.Company,
+					personToInsert.Address,
 				)
+				if err != nil {
+					panic(err.Error())
+				}
 				wg.Done()
 			}
 		}()
 	}
 	wg.Wait()
-
-	if err != nil {
-		panic(err.Error())
-	}
 }
 
-func randomPerson() Person {
-	var fakeGenerator = faker.New()
-
+func randomPerson(fakeGenerator faker.Faker) Person {
 	return Person{
 		FirstName:   fakeGenerator.Person().FirstName(),
 		LastName:    fakeGenerator.Person().LastName(),
 		DateOfBirth: fakeGenerator.Time().Time(time.Now()),
 		Company:     fakeGenerator.Company().Name(),
+		Address:     fakeGenerator.Address().Address(),
 	}
 }
 

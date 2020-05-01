@@ -69,6 +69,12 @@ EXPLAIN PLAN SELECT * FROM people_without_indexes WHERE company='Stuart';
 # BTrees
 
 ---
+
+# Cardinality
+
+- An index is more effective the more rows it can discard
+
+---
 <!-- _class: lead -->
 
 # Multiple column indexes
