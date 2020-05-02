@@ -11,7 +11,9 @@ backgroundImage: url('assets/bg.png')
 
 ---
 
-# mySQL
+<!-- _class: lead -->
+
+![10%](assets/mysql-logo.png)
 
 <!-- We will use mySQL as a mean to provide examples but this should be easily applicable to any other DB -->
 
@@ -29,7 +31,20 @@ backgroundImage: url('assets/bg.png')
 - As your tables grow and grow, accessing your data will be slower and slower
 
 ```sql
-SELECT * FROM people_without_indexes WHERE name="John";
+SELECT * FROM people_small WHERE name="John" AND company = "Mertz-Mertz";
+
+....
+
+took 7ms
+```
+
+
+```sql
+SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mertz";
+
+....
+
+took 3.8s
 ```
 
 ....
@@ -41,12 +56,29 @@ SELECT * FROM people_without_indexes WHERE name="John";
 - The basic mechanism to understand how your query will run
 
 ```sql
-EXPLAIN PLAN SELECT * FROM people_without_indexes WHERE company='Stuart';
+EXPLAIN SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mertz";
+```
+
+```shell
+id|select_type|table                 |partitions|type|possible_keys|key|key_len|ref|rows   |filtered|Extra      |
+--|-----------|----------------------|----------|----|-------------|---|-------|---|-------|--------|-----------|
+ 1|SIMPLE     |people_without_indexes|          |ALL |             |   |       |   |9417967|       1|Using where|
 ```
 
 ---
 
 # Reading an explain plan
+
+```shell
+id|select_type|table                 |partitions|type|possible_keys|key|key_len|ref|rows   |filtered|Extra      |
+--|-----------|----------------------|----------|----|-------------|---|-------|---|-------|--------|-----------|
+ 1|SIMPLE     |people_without_indexes|          |ALL |             |   |       |   |9417967|       1|Using where|
+```
+
+- *possible_keys*: Indexes that are applicable to your query
+- *key*: Index that mySQL decided that is the best for this query
+- *rows*: Number of rows in the index
+- *extra*: More information on how the index works
 
 
 ---
@@ -55,10 +87,6 @@ EXPLAIN PLAN SELECT * FROM people_without_indexes WHERE company='Stuart';
 
 - Normally we want to avoid
 - On absurdly bigtables maybe you need different mechanisms outside the scope of this talk
-
----
-
-# Speeding up queries with indexes
 
 ---
 
@@ -73,6 +101,13 @@ EXPLAIN PLAN SELECT * FROM people_without_indexes WHERE company='Stuart';
 # Cardinality
 
 - An index is more effective the more rows it can discard
+
+---
+
+# Costs of an index
+
+- Storage space
+- Insertion time
 
 ---
 <!-- _class: lead -->
