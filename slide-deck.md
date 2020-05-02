@@ -1,9 +1,9 @@
 ---
 theme: gaia
-_class: lead
-paginate: true
-backgroundColor: #fff
-backgroundImage: url('assets/bg.png')
+class:
+  - lead
+  - invert
+paginate: false
 ---
 <!-- _class: lead -->
 
@@ -13,7 +13,7 @@ backgroundImage: url('assets/bg.png')
 
 <!-- _class: lead -->
 
-![10%](assets/mysql-logo.png)
+![bg](assets/mysql-logo.png)
 
 <!-- We will use mySQL as a mean to provide examples but this should be easily applicable to any other DB -->
 
@@ -21,14 +21,14 @@ backgroundImage: url('assets/bg.png')
 
 # We will oversimplify
 
+![bg left](assets/kid-reading.jpg)
+
 <!-- In a lot of situations we will do simplifications. This is not an advanced talk -->
 
 
 ---
 
-# Your query is slow
-
-- As your tables grow and grow, accessing your data will be slower and slower
+# Your queries become slow
 
 ```sql
 SELECT * FROM people_small WHERE name="John" AND company = "Mertz-Mertz";
@@ -47,13 +47,13 @@ SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mert
 took 3.8s
 ```
 
-....
+<!-- Normally queries don't start slow. They gradually degrade through time -->
 
 ---
 
 # Explain plans
 
-- The basic mechanism to understand how your query will run
+The basic mechanism to understand how your query will run
 
 ```sql
 EXPLAIN SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mertz";
@@ -80,17 +80,15 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 - *rows*: Number of rows in the index
 - *extra*: More information on how the index works
 
-
 ---
 
-# Full scans on big tables
+<!-- _class: lead -->
 
-- Normally we want to avoid
-- On absurdly bigtables maybe you need different mechanisms outside the scope of this talk
-
----
+![bg left](./assets/table-of-contents.jpg)
 
 # Single column indexes
+
+<!-- Image attribution: https://www.flickr.com/photos/o_0/26278975918 -->
 
 ---
 
@@ -109,19 +107,38 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 - Storage space
 - Insertion time
 
+<!-- In mySQL we can check the performance schema to cleanup indexes -->
+
+
 ---
 <!-- _class: lead -->
 
 # Multiple column indexes
 
+![bg right](./assets/mandelbrot.jpg)
+
 ---
+<!-- _class: lead -->
 
 # Rules of thumb
 
-- Put first the column that will remove the most values
-- The range condition of the query should be the last one
-- Like indexes are range indexes
-- A %something query cannot use the index
+![bg left](./assets/rule-of-thumb.jpg)
+
+---
+
+# Put first the column that will remove the most values
+
+---
+
+# The range condition of the query should be the last one
+
+---
+
+# Like queries are range queries
+
+---
+
+# A LIKE %something query cannot use the index
 
 ---
 
@@ -137,16 +154,14 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 
 # Turning range queries into specific value queries
 
-- A classical trick is to turn a
-
 ``` sql
-WHERE A > 1 AND A < 3
+SELECT * WHERE A > 1 AND A < 3
 ```
 
 into
 
 ``` sql
-WHERE A IN (1, 2, 3)
+SELECT * WHERE A IN (1, 2, 3)
 ```
 
 
