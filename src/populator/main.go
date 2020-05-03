@@ -49,6 +49,8 @@ func main() {
 	copyTable(db, "people_without_indexes", "people_single_index")
 	copyTable(db, "people_without_indexes", "people_multi_column_index")
 	copyTable(db, "people_without_indexes", "people_range_query")
+
+	createIndexes(db)
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
@@ -67,8 +69,8 @@ func tableExists(db *sql.DB, tableName string) bool {
 	return result != 0
 }
 
-func loadDBSchema(db *sql.DB) {
-	content, err := ioutil.ReadFile("schema.sql")
+func executeSQLFile(db *sql.DB, filename string) {
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,6 +79,14 @@ func loadDBSchema(db *sql.DB) {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func loadDBSchema(db *sql.DB) {
+	executeSQLFile(db, "schema.sql")
+}
+
+func createIndexes(db *sql.DB) {
+	executeSQLFile(db, "indexes.sql")
 }
 
 func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {

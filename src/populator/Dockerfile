@@ -14,3 +14,4 @@ RUN mkdir /app
 COPY --from=builder /app/populator /app/
 WORKDIR /app/
 COPY schema.sql /app/
+COPY indexes.sql /app/

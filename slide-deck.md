@@ -25,6 +25,11 @@ paginate: false
 
 <!-- In a lot of situations we will do simplifications. This is not an advanced talk -->
 
+---
+
+# Batteries included
+
+You have a docker project that prepares the environment of this talk
 
 ---
 
@@ -75,9 +80,11 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
  1|SIMPLE     |people_without_indexes|          |ALL |             |   |       |   |9417967|       1|Using where|
 ```
 
+- *type*: Type of join to access the table
 - *possible_keys*: Indexes that are applicable to your query
 - *key*: Index that mySQL decided that is the best for this query
-- *rows*: Number of rows in the index
+- *rows*: Estimation of rows to be examined
+- *filtered*: Percentage of rows filtered by conditions
 - *extra*: More information on how the index works
 
 ---
@@ -92,6 +99,20 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 
 ---
 
+# ANALYZE TABLE
+
+Performs a key distribution analysis and stores the distribution for the named table or tables
+
+```sql
+ANALYZE TABLE people_single_index;
+```
+
+Remember to run when changing indexes in your playground
+
+<!-- So remember to analyze table when creating indexes in your playground -->
+
+---
+
 # BTrees
 
 ---
@@ -99,6 +120,8 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 # Cardinality
 
 - An index is more effective the more rows it can discard
+
+<!-- The primary key has cardinality equal to the number of rows. That makes it the most effective index to access individually -->
 
 ---
 
@@ -139,6 +162,16 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 ---
 
 # A LIKE %something query cannot use the index
+
+```sql
+EXPLAIN SELECT * FROM people_single_index WHERE name LIKE "%John";
+```
+
+```
+id|select_type|table              |partitions|type|possible_keys|key|key_len|ref|rows   |filtered|Extra      |
+--|-----------|-------------------|----------|----|-------------|---|-------|---|-------|--------|-----------|
+ 1|SIMPLE     |people_single_index|          |ALL |             |   |       |   |9676556|   11.11|Using where|
+ ```
 
 ---
 
