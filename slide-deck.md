@@ -205,3 +205,9 @@ SELECT * WHERE A IN (1, 2, 3)
 - Make values mandatory
 - Put wise defaults
 
+---
+
+# More info
+
+![10%](assets/mysql-book.png)
+
