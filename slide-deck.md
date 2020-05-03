@@ -31,6 +31,8 @@ paginate: false
 
 You have a docker project that prepares the environment of this talk
 
+[https://github.com/rafadc/talk_indexes](https://github.com/rafadc/talk_indexes)
+
 ---
 
 # Your queries become slow
@@ -115,11 +117,14 @@ Remember to run when changing indexes in your playground
 
 # BTrees
 
+![fit](./assets/btree.jpg)
+
+
 ---
 
 # Cardinality
 
-- An index is more effective the more rows it can discard
+An index is more effective the more rows it can discard
 
 <!-- The primary key has cardinality equal to the number of rows. That makes it the most effective index to access individually -->
 
@@ -209,5 +214,5 @@ SELECT * WHERE A IN (1, 2, 3)
 
 # More info
 
-![10%](assets/mysql-book.png)
+![bg left](assets/mysql-book.png)
 
