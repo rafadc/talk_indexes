@@ -156,9 +156,45 @@ An index is more effective the more rows it can discard
 
 # Put first the column that will remove the most values
 
+```sql
+SELECT *
+FROM people_multi_column_index
+USE INDEX (people_multi_column_index_happy_name_IDX)
+WHERE name = "john" AND happy = true;
+```
+
+---
+
+# Put first the column that will remove the most values
+
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john" AND happy = true;
+```
+
 ---
 
 # The range condition of the query should be the last one
+
+```sql
+SELECT *
+FROM people_multi_column_index
+USE INDEX (people_multi_column_index_date_of_birth_name_IDX)
+WHERE name = "john" AND date_of_birth > "2000-01-01";
+```
+
+<!-- If you think on the BTree structure we cannot use a range and then another value -->
+
+---
+
+# The range condition of the query should be the last one
+
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john" AND date_of_birth > "2000-01-01";
+```
 
 ---
 
@@ -177,16 +213,6 @@ id|select_type|table              |partitions|type|possible_keys|key|key_len|ref
 --|-----------|-------------------|----------|----|-------------|---|-------|---|-------|--------|-----------|
  1|SIMPLE     |people_single_index|          |ALL |             |   |       |   |9676556|   11.11|Using where|
  ```
-
----
-
-# Range queries
-
-
-| Name   | Surname     | Date of birth    |
-| ------ | ----------- | ---------------- |
-| Rafael | de Castro   | 14-04-1980       |
-
 
 ---
 
@@ -209,6 +235,14 @@ SELECT * WHERE A IN (1, 2, 3)
 
 - Make values mandatory
 - Put wise defaults
+
+---
+
+<!-- _class: lead -->
+
+# Sorting
+
+![bg right](./assets/order.jpg)
 
 ---
 
