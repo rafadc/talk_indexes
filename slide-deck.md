@@ -58,9 +58,50 @@ took 3.8s
 
 ---
 
+<!-- _class: lead -->
+
+![bg left](./assets/indexes.jpg)
+
+# Indexes
+
+<!-- Image attribution: https://www.flickr.com/photos/gotcredit/33756630285/in/photolist-TqXy7Z-41UtU-65pRH6-74qEZ5-74qFbQ-74qERU-74qEHb-74mLdZ-74mL4v-4rcRjS-74qF5N-Mcgq6s-25XMDFQ-29iao55-29jdUEd-e85NKw-29nixZp-4VJpnq-e85P8w-bfVCgn-bfVwrr-bfVypK-6wwm7H-66kvGn-KKAUxv-PNbZEk-LVgyVT-ejfuDg-oi246q-bfVogR-bfVqsH-bfVskt-bfVub2-bfVAyT-wLoYGz-4GX4gt-G3ANZh-omNTSx-ok1QQ7-o3yiZK-ojRrsL-o3yhNX-ok1Qzh-omNSkV-o3y2Wd-ojLeGZ-o3ykPA-L4gQTo-LemtJ2-od3DLC -->
+
+---
+
+# Index
+
+A DB structure to retrieve values more quickly
+
+---
+
+# Force index
+
+```sql
+SELECT *
+FROM people_multi_column_index
+USE INDEX (people_multi_column_index_happy_name_IDX)
+WHERE name = "john" AND happy = true;
+```
+
+---
+
+# ANALYZE TABLE
+
+Performs a key distribution analysis and stores the distribution for the named table or tables
+
+```sql
+ANALYZE TABLE people_single_index;
+```
+
+Remember to run when changing indexes in your playground
+
+<!-- So remember to analyze table when creating indexes in your playground -->
+
+---
+
 # Explain plans
 
-The basic mechanism to understand how your query will run
+The basic mechanism to understand how the query optimizer will run your query
 
 ```sql
 EXPLAIN SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mertz";
@@ -101,36 +142,22 @@ id|select_type|table                 |partitions|type|possible_keys|key|key_len|
 
 ---
 
-# ANALYZE TABLE
-
-Performs a key distribution analysis and stores the distribution for the named table or tables
-
-```sql
-ANALYZE TABLE people_single_index;
-```
-
-Remember to run when changing indexes in your playground
-
-<!-- So remember to analyze table when creating indexes in your playground -->
-
----
-
 # BTrees
 
 ![fit](./assets/btree.jpg)
-
 
 ---
 
 # Cardinality
 
+Uniqueness of values stored in a specified column within an index
 An index is more effective the more rows it can discard
 
 <!-- The primary key has cardinality equal to the number of rows. That makes it the most effective index to access individually -->
 
 ---
 
-# Costs of an index
+# Costs of maintaining an index
 
 - Storage space
 - Insertion time
@@ -146,11 +173,11 @@ An index is more effective the more rows it can discard
 ![bg right](./assets/mandelbrot.jpg)
 
 ---
-<!-- _class: lead -->
 
-# Rules of thumb
+# Multiple column indexes
 
-![bg left](./assets/rule-of-thumb.jpg)
+Sometimes we have not enough with filtering in only one column
+The order of the index fields is paramount
 
 ---
 
@@ -200,6 +227,8 @@ WHERE name = "john" AND date_of_birth > "2000-01-01";
 
 # Like queries are range queries
 
+Same rules as with a regular range query apply
+
 ---
 
 # A LIKE %something query cannot use the index
@@ -231,7 +260,7 @@ SELECT * WHERE A IN (1, 2, 3)
 
 ---
 
-# Tricking your users
+# Tricking your users to use your indexes more frequently
 
 - Make values mandatory
 - Put wise defaults
