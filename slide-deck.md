@@ -33,6 +33,8 @@ You have a docker project that prepares the environment of this talk
 
 [https://github.com/rafadc/talk_indexes](https://github.com/rafadc/talk_indexes)
 
+Feel free to use it as a playground to experiment
+
 ---
 
 # Your queries become slow
@@ -274,7 +276,7 @@ Same rules as with a regular range query apply
 
 ---
 
-# A LIKE %something query cannot use the index
+# A "LIKE %something" query cannot use the index
 
 ```sql
 EXPLAIN SELECT * FROM people_single_index WHERE name LIKE "%John";
@@ -317,6 +319,43 @@ SELECT * WHERE A IN (1, 2, 3)
 ![bg right](./assets/order.jpg)
 
 ---
+
+# A sort can use an index
+
+```sql
+EXPLAIN
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john" ORDER BY date_of_birth ASC;
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key    |key_len|ref  |rows|filtered|Extra                |
+--|-----------|-------------------------|----------|----|--------------|-------|-------|-----|----|--------|---------------------|
+ 1|SIMPLE     |people_multi_column_index|          |ref |  [...]       | [...] |102    |const|3540|     100|Using index condition|
+```
+
+---
+
+# A sort can use an index
+
+```sql
+EXPLAIN
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john" ORDER BY date_of_birth DESC;
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key    |key_len|ref  |rows|filtered|Extra      |
+--|-----------|-------------------------|----------|----|--------------|-------|-------|-----|----|--------|-----------|
+ 1|SIMPLE     |people_multi_column_index|          |ref |  [...]       | [...] |102    |const|3540|     100|Using where|
+```
+
+⚠ Only if the index is using the same order ⚠
+
+---
+
 
 # More info
 
