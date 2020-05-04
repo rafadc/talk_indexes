@@ -83,6 +83,8 @@ USE INDEX (people_multi_column_index_happy_name_IDX)
 WHERE name = "john" AND happy = true;
 ```
 
+<!-- You can always manually choose an index but it ismore interesting to know when the query optimizer pìcks an index -->
+
 ---
 
 # ANALYZE TABLE
@@ -164,6 +166,41 @@ An index is more effective the more rows it can discard
 
 <!-- In mySQL we can check the performance schema to cleanup indexes -->
 
+---
+
+# Index only queries
+
+Sometimes you don't even need to go to the table
+
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john";
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key                                     |key_len|ref  |rows|filtered|Extra|
+--|-----------|-------------------------|----------|----|--------------|----------------------------------------|-------|-----|----|--------|-----|
+ 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_happy_IDX|102    |const|3540|     100|     |
+```
+
+---
+
+# Index only queries
+
+Sometimes you don't even need to go to the table
+
+```sql
+SELECT name, date_of_birth
+FROM people_multi_column_index
+WHERE name = "john";
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key                                             |key_len|ref  |rows|filtered|Extra      |
+--|-----------|-------------------------|----------|----|--------------|------------------------------------------------|-------|-----|----|--------|-----------|
+ 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_date_of_birth_IDX|102    |const|3540|     100|Using index|
+```
 
 ---
 <!-- _class: lead -->
@@ -200,6 +237,10 @@ FROM people_multi_column_index
 WHERE name = "john" AND happy = true;
 ```
 
+☣ There is no indication in the explain plan ☣
+
+<!-- The query optimizer has no way of knowing this -->
+
 ---
 
 # The range condition of the query should be the last one
@@ -222,6 +263,8 @@ SELECT *
 FROM people_multi_column_index
 WHERE name = "john" AND date_of_birth > "2000-01-01";
 ```
+
+☣ There is no indication in the explain plan ☣
 
 ---
 
