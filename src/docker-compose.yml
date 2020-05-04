@@ -19,6 +19,9 @@ services:
     depends_on:
       - mysql
     command: "./populator"
+    environment:
+      WORKERS: "20"
+      NUMBER_OF_RECORDS: "10000000"
 
 volumes:
   data:

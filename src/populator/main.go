@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -24,8 +25,6 @@ type Person struct {
 	Happy       bool
 }
 
-var workers = 20
-
 func main() {
 	db := connectToDB()
 	defer db.Close()
@@ -38,8 +37,13 @@ func main() {
 	log.Println("mySQL seems not to be populated yet. Starting...")
 	loadDBSchema(db)
 
+	numberOfRecords, err := strconv.Atoi(os.Getenv("NUMBER_OF_RECORDS"))
+	if err != nil {
+		panic(err.Error())
+	}
+
 	populatePeopleTable(db, "people_small", 1_000)
-	populatePeopleTable(db, "people_without_indexes", 10_000_000)
+	populatePeopleTable(db, "people_without_indexes", numberOfRecords)
 	copyTable(db, "people_without_indexes", "people_single_index")
 	copyTable(db, "people_without_indexes", "people_multi_column_index")
 	copyTable(db, "people_without_indexes", "people_range_query")
@@ -57,7 +61,7 @@ func connectToDB() *sql.DB {
 	}
 
 	db.SetMaxOpenConns(40)
-	db.SetMaxIdleConns(workers)
+	db.SetMaxIdleConns(workers())
 
 	return db
 }
@@ -103,13 +107,13 @@ func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 
 	var wg sync.WaitGroup
 
-	if numberOfPeople%workers != 0 {
+	if numberOfPeople%workers() != 0 {
 		panic("The number of people must be divisible by the number of workers")
 	}
 
 	wg.Add(numberOfPeople)
 
-	for i := 0; i < workers; i++ {
+	for i := 0; i < workers(); i++ {
 		go func() {
 			var fakeGenerator = faker.New()
 			insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company, address, happy) VALUES(?,?,?,?,?,?)", tableName)
@@ -120,7 +124,7 @@ func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 			}
 			defer insertQuery.Close()
 
-			for j := 0; j < numberOfPeople/workers; j++ {
+			for j := 0; j < numberOfPeople/workers(); j++ {
 				personToInsert := randomPerson(fakeGenerator)
 				_, err := insertQuery.Exec(
 					personToInsert.FirstName,
@@ -169,4 +173,13 @@ func copyTable(db *sql.DB, sourceTable string, targetTable string) {
 		panic(err.Error())
 	}
 	defer query.Close()
+}
+
+func workers() int {
+	workers, err := strconv.Atoi(os.Getenv("WORKERS"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return workers
 }
