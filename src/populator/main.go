@@ -36,6 +36,8 @@ func main() {
 	}
 
 	db.SetMaxOpenConns(40)
+	db.SetMaxIdleConns(workers)
+
 	defer db.Close()
 
 	if tableExists(db, "people_without_indexes") {
