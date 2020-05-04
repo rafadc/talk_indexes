@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"sync"
 	"time"
@@ -20,6 +21,7 @@ type Person struct {
 	DateOfBirth time.Time
 	Company     string
 	Address     string
+	Happy       bool
 }
 
 var workers = 20
@@ -103,7 +105,7 @@ func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 	for i := 0; i < workers; i++ {
 		go func() {
 			var fakeGenerator = faker.New()
-			insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company, address) VALUES(?,?,?,?,?)", tableName)
+			insertQueryText := fmt.Sprintf("INSERT INTO %s(name,surname,date_of_birth,company, address, happy) VALUES(?,?,?,?,?,?)", tableName)
 			insertQuery, err := db.Prepare(insertQueryText)
 
 			if err != nil {
@@ -119,6 +121,7 @@ func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
 					personToInsert.DateOfBirth,
 					personToInsert.Company,
 					personToInsert.Address,
+					personToInsert.Happy,
 				)
 				if err != nil {
 					panic(err.Error())
@@ -137,6 +140,7 @@ func randomPerson(fakeGenerator faker.Faker) Person {
 		DateOfBirth: fakeGenerator.Time().Time(time.Now()),
 		Company:     fakeGenerator.Company().Name(),
 		Address:     fakeGenerator.Address().Address(),
+		Happy:       rand.Intn(10_000) > 0,
 	}
 }
 

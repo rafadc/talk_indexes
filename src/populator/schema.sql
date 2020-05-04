@@ -4,7 +4,8 @@ CREATE TABLE people_small (
 	surname varchar(200) NOT NULL,
 	date_of_birth DATE NOT NULL,
 	company varchar(100) NOT NULL,
-	address varchar(200) NOT NULL
+	address varchar(200) NOT NULL,
+	happy tinyint NOT NULL
 )
 ENGINE=InnoDB;
 
@@ -14,7 +15,8 @@ CREATE TABLE people_without_indexes (
 	surname varchar(200) NOT NULL,
 	date_of_birth DATE NOT NULL,
 	company varchar(100) NOT NULL,
-	address varchar(200) NOT NULL
+	address varchar(200) NOT NULL,
+	happy tinyint NOT NULL
 )
 ENGINE=InnoDB;
 
