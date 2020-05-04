@@ -27,17 +27,7 @@ type Person struct {
 var workers = 20
 
 func main() {
-	log.Println("Giving time mySQL to start...")
-	time.Sleep(15 * time.Second)
-
-	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes?multiStatements=true")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	db.SetMaxOpenConns(40)
-	db.SetMaxIdleConns(workers)
-
+	db := connectToDB()
 	defer db.Close()
 
 	if tableExists(db, "people_without_indexes") {
@@ -55,6 +45,21 @@ func main() {
 	copyTable(db, "people_without_indexes", "people_range_query")
 
 	createIndexes(db)
+}
+
+func connectToDB() *sql.DB {
+	log.Println("Giving time mySQL to start...")
+	time.Sleep(15 * time.Second)
+
+	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes?multiStatements=true")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	db.SetMaxOpenConns(40)
+	db.SetMaxIdleConns(workers)
+
+	return db
 }
 
 func tableExists(db *sql.DB, tableName string) bool {
