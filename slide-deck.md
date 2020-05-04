@@ -243,7 +243,7 @@ WHERE name = "john" AND happy = true;
 
 ---
 
-# The range condition of the query should be the last one
+# The range condition of the query should be the last one in the index
 
 ```sql
 SELECT *
@@ -256,7 +256,7 @@ WHERE name = "john" AND date_of_birth > "2000-01-01";
 
 ---
 
-# The range condition of the query should be the last one
+# The range condition of the query should be the last one in the index
 
 ```sql
 SELECT *
