@@ -76,6 +76,12 @@ A DB structure to retrieve values more quickly
 
 ---
 
+# Index
+
+As a rule of thumb think that one query uses one index
+
+---
+
 # Force index
 
 ```sql
