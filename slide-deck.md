@@ -78,7 +78,9 @@ A DB structure to retrieve values more quickly
 
 # Index
 
-As a rule of thumb think that one query uses one index
+As a rule of thumb one query uses one index
+
+<!-- This is not true at all. We have union indexes or merge indexes but we will simplify our mental model -->
 
 ---
 
@@ -223,6 +225,12 @@ id|select_type|table                    |partitions|type|possible_keys |key     
 
 Sometimes we have not enough with filtering in only one column
 The order of the index fields is paramount
+
+---
+
+# Candidate indexes
+
+In order to use a column in the index its previous column needs to be in the WHERE clause
 
 ---
 
