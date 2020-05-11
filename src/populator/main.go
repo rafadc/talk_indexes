@@ -15,7 +15,7 @@ import (
 	"github.com/jaswdr/faker"
 )
 
-const maxRetries = 30
+const maxRetries = 50
 
 // Person represents a record to be generated and inserted
 type Person struct {
@@ -56,15 +56,22 @@ func main() {
 func connectToDB() *sql.DB {
 	log.Println("Trying to connect to mySQL...")
 
+	db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes?multiStatements=true")
+	if err != nil {
+		panic("Incorrect URL in mySQL")
+	}
+
 	for retry := 0; retry < maxRetries; retry++ {
-		db, err := sql.Open("mysql", "indexes:indexes@tcp(mysql:3306)/indexes?multiStatements=true")
+		err = db.Ping()
+
 		if err != nil {
 			time.Sleep(1 * time.Second)
+			log.Println("retrying...")
 		} else {
 			db.SetMaxOpenConns(40)
 			db.SetMaxIdleConns(workers())
+			return db
 		}
-		return db
 	}
 
 	panic("Couldn't get a connection to database")

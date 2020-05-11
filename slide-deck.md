@@ -178,39 +178,32 @@ An index is more effective the more rows it can discard
 
 ---
 
-# Index only queries
-
-Sometimes you don't even need to go to the table
+# A simple query
 
 ```sql
-SELECT *
-FROM people_multi_column_index
-WHERE name = "john";
+SELECT * FROM people_without_indexes WHERE name="John" AND company = "Mertz-Mertz";
+
+....
+
+took 3.8s
 ```
-
-```
-id|select_type|table                    |partitions|type|possible_keys |key                                     |key_len|ref  |rows|filtered|Extra|
---|-----------|-------------------------|----------|----|--------------|----------------------------------------|-------|-----|----|--------|-----|
- 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_happy_IDX|102    |const|3540|     100|     |
-```
-
----
-
-# Index only queries
-
-Sometimes you don't even need to go to the table
 
 ```sql
-SELECT name, date_of_birth
-FROM people_multi_column_index
-WHERE name = "john";
+CREATE INDEX people_single_index_name_IDX USING BTREE ON indexes.people_single_index (name);
 ```
 
+
+```sql
+SELECT * FROM people_single_index WHERE name="John" AND company = "Mertz-Mertz";
+
+....
+
+took 124ms
 ```
-id|select_type|table                    |partitions|type|possible_keys |key                                             |key_len|ref  |rows|filtered|Extra      |
---|-----------|-------------------------|----------|----|--------------|------------------------------------------------|-------|-----|----|--------|-----------|
- 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_date_of_birth_IDX|102    |const|3540|     100|Using index|
-```
+
+
+<!-- In the most simple scenarios an index can bring your speed back -->
+
 
 ---
 <!-- _class: lead -->
@@ -321,6 +314,43 @@ into
 
 ``` sql
 SELECT * WHERE A IN (1, 2, 3)
+```
+
+
+---
+
+# Index only queries
+
+Sometimes you don't even need to go to the table
+
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE name = "john";
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key                                     |key_len|ref  |rows|filtered|Extra|
+--|-----------|-------------------------|----------|----|--------------|----------------------------------------|-------|-----|----|--------|-----|
+ 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_happy_IDX|102    |const|3540|     100|     |
+```
+
+---
+
+# Index only queries
+
+Sometimes you don't even need to go to the table
+
+```sql
+SELECT name, date_of_birth
+FROM people_multi_column_index
+WHERE name = "john";
+```
+
+```
+id|select_type|table                    |partitions|type|possible_keys |key                                             |key_len|ref  |rows|filtered|Extra      |
+--|-----------|-------------------------|----------|----|--------------|------------------------------------------------|-------|-----|----|--------|-----------|
+ 1|SIMPLE     |people_multi_column_index|          |ref |    [...]     |people_multi_column_index_name_date_of_birth_IDX|102    |const|3540|     100|Using index|
 ```
 
 
