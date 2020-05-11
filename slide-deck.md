@@ -265,9 +265,11 @@ EXPLAIN SELECT * FROM people_multi_column_index WHERE name = "John" AND company 
 ```
 
 ```
-id|select_type|table                    |type|possible_keys                                                                            |key                                     |key_len|ref  |rows|filtered|Extra      |
---|-----------|-------------------------|----|-----------------------------------------------------------------------------------------|----------------------------------------|-------|-----|----|--------|-----------|
- 1|SIMPLE     |people_multi_column_index|ref |people_multi_column_index_name_happy_IDX,people_multi_column_index_name_date_of_birth_IDX|people_multi_column_index_name_happy_IDX|102    |const|3500|      10|Using where|
+id|select_type|table                    |type|possible_keys                                    |key                                       |key_len|ref        |rows|filtered|Extra|
+--|-----------|-------------------------|----|-------------------------------------------------|------------------------------------------|-------|-----------|----|--------|-----|
+ 1|SIMPLE     |people_multi_column_index|ref |people_multi_column_index_name_happy_IDX         |people_multi_column_index_name_company_IDX|204    |const,const|   1|     100|     |
+                                              people_multi_column_index_name_date_of_birth_IDX
+                                              people_multi_column_index_name_company_IDX
 ```
 
 
