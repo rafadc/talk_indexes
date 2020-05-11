@@ -234,6 +234,46 @@ In order to use a column in the index its previous column needs to be in the WHE
 
 ---
 
+# Candidate indexes
+
+```sql
+CREATE INDEX people_multi_column_index_name_company_IDX USING BTREE ON indexes.people_multi_column_index (name, company);
+```
+
+```sql
+EXPLAIN SELECT * FROM people_multi_column_index WHERE company = "Mitchell PLC";
+```
+
+```
+id|select_type|table                    |type|possible_keys|key|key_len|ref|rows   |filtered|Extra      |
+--|-----------|-------------------------|----|-------------|---|-------|---|-------|--------|-----------|
+ 1|SIMPLE     |people_multi_column_index|ALL |             |   |       |   |9700871|      10|Using where|
+```
+
+
+
+---
+
+# Candidate indexes
+
+```sql
+CREATE INDEX people_multi_column_index_name_company_IDX USING BTREE ON indexes.people_multi_column_index (name, company);
+```
+
+```sql
+EXPLAIN SELECT * FROM people_multi_column_index WHERE name = "John" AND company = "Mitchell PLC";
+```
+
+```
+id|select_type|table                    |type|possible_keys                                                                            |key                                     |key_len|ref  |rows|filtered|Extra      |
+--|-----------|-------------------------|----|-----------------------------------------------------------------------------------------|----------------------------------------|-------|-----|----|--------|-----------|
+ 1|SIMPLE     |people_multi_column_index|ref |people_multi_column_index_name_happy_IDX,people_multi_column_index_name_date_of_birth_IDX|people_multi_column_index_name_happy_IDX|102    |const|3500|      10|Using where|
+```
+
+
+
+---
+
 # Put first the column that will remove the most values
 
 ```sql
