@@ -221,6 +221,13 @@ id|select_type|table                    |partitions|type|possible_keys |key     
 
 ---
 
+
+# Multi column BTrees
+
+![fit](./assets/btree.jpg)
+
+---
+
 # Multiple column indexes
 
 Sometimes we have not enough with filtering in only one column

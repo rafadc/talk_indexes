@@ -1,6 +1,6 @@
 # Indexes
 
-Notes on my talk about indexes
+Notes on my small talk about indexes
 
 ## Demo toolkit
 
