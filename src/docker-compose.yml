@@ -12,7 +12,7 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
 
   populator:
     build: populator/.
@@ -24,4 +24,4 @@ services:
       NUMBER_OF_RECORDS: "10000000"
 
 volumes:
-  data:
+  mysql_data:

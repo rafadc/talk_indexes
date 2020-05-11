@@ -51,6 +51,8 @@ func main() {
 	copyTable(db, "people_without_indexes", "people_range_query")
 
 	createIndexes(db)
+
+	log.Println("Done!")
 }
 
 func connectToDB() *sql.DB {
@@ -114,7 +116,7 @@ func createIndexes(db *sql.DB) {
 }
 
 func populatePeopleTable(db *sql.DB, tableName string, numberOfPeople int) {
-	log.Println("Populating table ", tableName)
+	log.Printf("Populating table %s with %d records", tableName, numberOfPeople)
 
 	var wg sync.WaitGroup
 
@@ -167,7 +169,7 @@ func randomPerson(fakeGenerator faker.Faker) Person {
 }
 
 func copyTable(db *sql.DB, sourceTable string, targetTable string) {
-	log.Println("Copying table %s into %s", sourceTable, targetTable)
+	log.Printf("Copying table %s into %s\n", sourceTable, targetTable)
 
 	createTableQuery := fmt.Sprintf("CREATE TABLE %s LIKE %s", targetTable, sourceTable)
 	query, err := db.Query(createTableQuery)
