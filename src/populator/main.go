@@ -49,6 +49,7 @@ func main() {
 	copyTable(db, "people_without_indexes", "people_single_index")
 	copyTable(db, "people_without_indexes", "people_multi_column_index")
 	copyTable(db, "people_without_indexes", "people_range_query")
+	copyTable(db, "people_without_indexes", "people_full_text_search")
 
 	createIndexes(db)
 
