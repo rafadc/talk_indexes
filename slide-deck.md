@@ -276,23 +276,42 @@ id|select_type|table                    |type|possible_keys                     
 
 ---
 
-# Put first the column that will remove the most values
+# The distribution of values is important
 
 ```sql
-SELECT *
-FROM people_multi_column_index
-USE INDEX (people_multi_column_index_happy_name_IDX)
-WHERE name = "john" AND happy = true;
+SELECT COUNT(*) FROM people_multi_column_index WHERE happy = true;
+```
+
+```
+9998964
 ```
 
 ---
 
-# Put first the column that will remove the most values
+# The distribution of values is important
+
+Slow
 
 ```sql
 SELECT *
 FROM people_multi_column_index
-WHERE name = "john" AND happy = true;
+WHERE company = "Sample" AND happy = true;
+
+took 55s
+```
+
+---
+
+# The distribution of values is important
+
+Fast
+
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE company = "Sample" AND happy = false;
+
+took 10ms
 ```
 
 ☣ There is no indication in the explain plan ☣
@@ -308,6 +327,8 @@ SELECT *
 FROM people_multi_column_index
 USE INDEX (people_multi_column_index_date_of_birth_name_IDX)
 WHERE name = "john" AND date_of_birth > "2000-01-01";
+
+took 1s.
 ```
 
 <!-- If you think on the BTree structure we cannot use a range and then another value -->
@@ -320,6 +341,8 @@ WHERE name = "john" AND date_of_birth > "2000-01-01";
 SELECT *
 FROM people_multi_column_index
 WHERE name = "john" AND date_of_birth > "2000-01-01";
+
+took 3ms.
 ```
 
 ☣ There is no indication in the explain plan ☣
