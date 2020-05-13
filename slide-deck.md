@@ -215,16 +215,17 @@ took 124ms
 ---
 
 
-# Multi column BTrees
-
-![fit](./assets/btree.jpg)
-
----
-
 # Multiple column indexes
 
 Sometimes we have not enough with filtering in only one column
 The order of the index fields is paramount
+
+---
+
+# Multi column BTrees
+
+![fit](./assets/btree.jpg)
+
 
 ---
 
@@ -330,9 +331,15 @@ WHERE name = "john" AND date_of_birth > "2000-01-01";
 
 Same rules as with a regular range query apply
 
+```sql
+SELECT *
+FROM people_multi_column_index
+WHERE name LIKE "john%" AND date_of_birth > "2000-01-01";
+```
+
 ---
 
-# A "LIKE %something" query cannot use the index
+# A "LIKE %something" query cannot use a BTree
 
 ```sql
 EXPLAIN SELECT * FROM people_single_index WHERE name LIKE "%John";
@@ -342,6 +349,22 @@ EXPLAIN SELECT * FROM people_single_index WHERE name LIKE "%John";
 id|select_type|table              |partitions|type|possible_keys|key|key_len|ref|rows   |filtered|Extra      |
 --|-----------|-------------------|----------|----|-------------|---|-------|---|-------|--------|-----------|
  1|SIMPLE     |people_single_index|          |ALL |             |   |       |   |9676556|   11.11|Using where|
+ ```
+
+---
+
+# A "LIKE %something" query cannot use a BTree
+
+```sql
+CREATE FULLTEXT INDEX people_full_text_search_name_IDX ON indexes.people_full_text_search (name) WITH PARSER ngram;
+
+EXPLAIN SELECT * FROM people_full_text_search WHERE MATCH(name) AGAINST ("ohn");
+```
+
+```
+id|select_type|table                  |partitions|type    |possible_keys                   |key                             |key_len|ref  |rows|filtered|Extra                        |
+--|-----------|-----------------------|----------|--------|--------------------------------|--------------------------------|-------|-----|----|--------|-----------------------------|
+ 1|SIMPLE     |people_full_text_search|          |fulltext|people_full_text_search_name_IDX|people_full_text_search_name_IDX|0      |const|   1|     100|Using where; Ft_hints: sorted|
  ```
 
 ---
